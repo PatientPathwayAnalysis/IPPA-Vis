@@ -153,37 +153,3 @@ as_referrals <- function(ps, stages, suffix) {
   
   return (list(Flows=flows, Hierarchy=hier, Stages=stages))
 }
-
-
-df2latex <- function(df, file) {
-  
-  rown <- rownames(df)
-  coln <- colnames(df)
-  
-  cnc <- paste0(coln, collapse="&")
-  
-  cov.tab <- sapply(1:length(rown), function(i) {
-    ot <- paste0(rown[i], "&", paste0(df[i,], collapse="&" ))
-    ot
-  })
-  cov.tab <- paste0(cov.tab, "\\\\", collapse="\n")
-  
-  
-  tline <- "\\toprule"
-  mline <- "\\midrule"
-  bline <- "\\bottomrule"
-  
-  tab.out <- paste0(c(
-    paste0("\\begin{tabular}{",paste0(rep("l", length(coln)+1), collapse=""),"}"), 
-    tline,
-    paste0("&\\multicolumn{",length(coln),"}{c}{ }\\\\"),
-    paste0("&",paste0(cnc, collapse="&"), "\\\\"),
-    mline,
-    cov.tab,
-    bline,
-    #"\\textit{Note:}  & \\dagger if the pathway experienced 2003 (the year with SARS) \\\\", 
-    "\\end{tabular}")  
-    , collapse="\n"
-  )
-  write(tab.out, file)
-}

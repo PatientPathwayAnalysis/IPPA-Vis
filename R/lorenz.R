@@ -1,9 +1,11 @@
-
-
-
-lor <- read.csv(paste0("../Data/Output/OutputTest/SC60_60_30r", '/post/Lorenz.csv'), stringsAsFactors = F)
-
-
+#' Title
+#'
+#' @param lor 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 draw.lorenz.join <- function(lor) {
   lor.join <- c()
   gini.join <- c()
@@ -67,7 +69,3 @@ draw.lorenz.join <- function(lor) {
     theme_minimal() +
     theme(legend.position="bottom", axis.title.y.right = element_text(angle = 90, hjust = 0.5))
 }
-
-
-
-g <- draw.lorenz.join(lor)

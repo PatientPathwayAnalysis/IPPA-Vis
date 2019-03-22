@@ -1,8 +1,17 @@
-library(ggplot2)
-source("src/format.R")
-
-
-visualise_pattern_freq <- function(pathways, maps, 
+#' Draw pattern frequency diagram
+#'
+#' @param pathways json formated patient pathways
+#' @param maps colour maps
+#' @param x.lab label of x-axis
+#' @param y.lab label of y-axis
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' pat.freq <- visualise_pattern_freq(pseudo.tb.js)
+#' print(pat.freq)
+visualise_pattern_freq <- function(pathways, maps=state_space_tb$GP, 
                                    x.lab="Proportion of time in stages (%)", 
                                    y.lab="Accumulated pathways") {
   
@@ -15,18 +24,18 @@ visualise_pattern_freq <- function(pathways, maps,
   
   pf$State <- factor(pf$State, levels=maps$State)
   
-  g <- ggplot(data=pf) +
-    geom_rect(aes(xmin = x0, xmax = x1, ymin = y0, ymax = y1, fill = State)) +
-    facet_wrap(~Group, nrow=2) +
-    scale_fill_manual("Stage/State",
+  g <- ggplot2::ggplot(data=pf) +
+    ggplot2::geom_rect(ggplot2::aes(xmin=x0, xmax=x1, ymin=y0, ymax=y1, fill=State)) +
+    ggplot2::facet_wrap(~Group, nrow=2) +
+    ggplot2::scale_fill_manual("Stage/State",
                       breaks=maps$State,
                       values=maps$Colour, 
                       labels=maps$StateShow, drop=FALSE) +
-    xlab(x.lab) + ylab(y.lab) + 
-    guides(fill = guide_legend(ncol=1)) +
-    theme_minimal() + 
-    theme(strip.text.x = element_text(face="bold"),
-          strip.background = element_rect(fill="#CCCCCC", colour="white"))
+    ggplot2::xlab(x.lab) + ggplot2::ylab(y.lab) + 
+    ggplot2::guides(fill=ggplot2::guide_legend(ncol=1)) +
+    ggplot2::theme_minimal() + 
+    ggplot2::theme(strip.text.x=ggplot2::element_text(face="bold"),
+                   strip.background=ggplot2::element_rect(fill="#CCCCCC", colour="white"))
   
   g
 }

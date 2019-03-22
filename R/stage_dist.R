@@ -1,8 +1,19 @@
-library(ggplot2)
-source("src/format.R")
-
-
-visualise_stage_dist <- function(pathways, maps, 
+#' Draw stage distribution diagram
+#'
+#' @param pathways json formated patient pathways
+#' @param maps colour maps
+#' @param x.lab label of x-axis
+#' @param y.lab label of y-axis
+#' @param t_end read end of the diagram, default = 365 days
+#' @param dt bar update frequency of the diagram
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' st.di <- visualise_stage_dist(pseudo.tb.js)
+#' print(st.di)
+visualise_stage_dist <- function(pathways, maps=state_space_tb$All, 
                                    x.lab="Time since first visit (day)", 
                                    y.lab="Stage distribution",
                                    t_end=365, dt=1) {
@@ -27,22 +38,17 @@ visualise_stage_dist <- function(pathways, maps,
   sts <- sts[order(sts$x0, sts$State),]
   
   
-  g <- ggplot(data=sts) +
-    geom_rect(aes(xmin=x0, xmax=x1, ymin=y0, ymax=y1, fill=State)) +
-    scale_fill_manual("Stage/State",
+  g <- ggplot2::ggplot(data=sts) +
+    ggplot2::geom_rect(ggplot2::aes(xmin=x0, xmax=x1, ymin=y0, ymax=y1, fill=State)) +
+    ggplot2::scale_fill_manual("Stage/State",
                       breaks=maps$State,
                       values=maps$Colour, 
                       labels=maps$StateShow, drop=FALSE) +
-    xlab(x.lab) + ylab(y.lab) + 
-    guides(fill=guide_legend(ncol=1)) +
-    theme_minimal() + 
-    theme(strip.text.x=element_text(face="bold"),
-          strip.background=element_rect(fill="#CCCCCC", colour="white"))
+    ggplot2::xlab(x.lab) + ggplot2::ylab(y.lab) + 
+    ggplot2::guides(fill=ggplot2::guide_legend(ncol=1)) +
+    ggplot2::theme_minimal() + 
+    ggplot2::theme(strip.text.x=ggplot2::element_text(face="bold"),
+          strip.background=ggplot2::element_rect(fill="#CCCCCC", colour="white"))
   
   g
 }
-
-
-
-
-

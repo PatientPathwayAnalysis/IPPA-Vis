@@ -1,7 +1,3 @@
-library(ggplot2)
-source("src/format.R")
-
-
 draw_sankey <- function(hier, flows, stages, y.lab="Level", tag=T, bar.width=10, padding=10, height=200, interval=70, n.step=50) {
   stocks <- data.frame(Stage=rep(names(hier), sapply(hier, length)), Level=unlist(hier),
                        value=0, x0=-1, y0=-1, y1=-1, stringsAsFactors = F)
@@ -65,16 +61,16 @@ draw_sankey <- function(hier, flows, stages, y.lab="Level", tag=T, bar.width=10,
     }
   }
   
-  plt <- ggplot(data=stocks) +
-    geom_rect(aes(xmin=x0, xmax=x1, ymin=y0, ymax=y1, fill=Level))
+  plt <- ggplot2::ggplot(data=stocks) +
+    ggplot2::geom_rect(ggplot2::aes(xmin=x0, xmax=x1, ymin=y0, ymax=y1, fill=Level))
   
   if (tag) {
     plt <- plt +
-      geom_label(aes(x=(x0+x1)/2, y=(y0+y1)/2, label=Level), alpha=0.7)
+      ggplot2::geom_label(ggplot2::aes(x=(x0+x1)/2, y=(y0+y1)/2, label=Level), alpha=0.7)
   }
 
   dat <- unique(stocks[c("Stage", "x0", "x1")])
-  plt <- plt + scale_x_continuous(breaks = (dat$x0+dat$x1)/2, label = stages)
+  plt <- plt + ggplot2::scale_x_continuous(breaks=(dat$x0+dat$x1)/2, label=stages)
   
   for (i in 1:nrow(flows)) {
     plt <- plt + with(flows[i, ], {
@@ -83,32 +79,37 @@ draw_sankey <- function(hier, flows, stages, y.lab="Level", tag=T, bar.width=10,
       ys.lower <- y1s + (y1t-y1s)/2 * (sin(xx) + 1 )
       xs <- seq(x0, x1, length.out = n.step)
       dat <- data.frame(xs, ys.lower, ys.upper)
-      geom_ribbon(aes(x=xs, ymin=ys.lower, ymax=ys.upper), fill="darkgreen", alpha=0.3, data=dat)
+      ggplot2::geom_ribbon(ggplot2::aes(x=xs, ymin=ys.lower, ymax=ys.upper), fill="darkgreen", alpha=0.3, data=dat)
     })
   }
   
-  plt <- plt + labs(x="Stage", y="Hospital level") +
-    guides(color=guide_legend(title="F")) +
-    theme(legend.position="bottom")
+  plt <- plt + ggplot2::labs(x="Stage", y="Hospital level") +
+    ggplot2::guides(color=ggplot2::guide_legend(title="F")) +
+    ggplot2::theme(legend.position="bottom")
   plt
 }
 
 
+#' Draw referral diagram
+#'
+#' @param ps dataframe of pathway features
+#' @param bar.width width of bars
+#' @param padding padding of bars
+#' @param height total height of bars
+#' @param interval interval between stages
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' ref <- visualise_referrals(pseudo.tb.p, bar.width=40)
+#' print(ref)
 visualise_referrals <- function(ps, bar.width=10, padding=10, height=200, interval=70) {
-  ps$WaitingLevel[!(ps$WaitingLevel %in% LETTERS[1:4])] <- "A"
-  ps$EvaluatingLevel[!(ps$EvaluatingLevel %in% LETTERS[1:4])] <- "A"
-  ps$DetectingLevel[!(ps$DetectingLevel %in% LETTERS[1:4])] <- "A"
-  ps$TreatingLevel[!(ps$TreatingLevel %in% LETTERS[1:4])] <- "A"
-  
-  ps$WaitingLevel <- factor(as.character(ps$WaitingLevel), levels=LETTERS[1:4])
-  ps$EvaluatingLevel <- factor(as.character(ps$EvaluatingLevel), levels=LETTERS[1:4])
-  ps$DetectingLevel <- factor(as.character(ps$DetectingLevel), levels=LETTERS[1:4])
-  ps$TreatingLevel <- factor(as.character(ps$TreatingLevel), levels=LETTERS[1:4])
+  # ps$WaitingLevel <- factor(as.character(ps$WaitingLevel), levels=LETTERS[1:4])
+  # ps$EvaluatingLevel <- factor(as.character(ps$EvaluatingLevel), levels=LETTERS[1:4])
+  # ps$DetectingLevel <- factor(as.character(ps$DetectingLevel), levels=LETTERS[1:4])
+  # ps$TreatingLevel <- factor(as.character(ps$TreatingLevel), levels=LETTERS[1:4])
     
-  ps$WaitingLS <- factor(paste(ps$WaitingLevel, ps$WaitingSector))
-  ps$EvaluatingLS <- factor(paste(ps$EvaluatingLevel, ps$EvaluatingSector))
-  ps$DetectingLS <- factor(paste(ps$DetectingLevel, ps$DetectingSector))
-  ps$TreatingLS <- factor(paste(ps$TreatingLevel, ps$TreatingSector))
   
   res <- list()
   ref <- as_referrals(ps, c("Waiting", "Evaluating", "Detecting", "Treating"), "Level")
@@ -116,20 +117,8 @@ visualise_referrals <- function(ps, bar.width=10, padding=10, height=200, interv
                            bar.width=bar.width, padding=padding, height=height, interval=interval)
   
   res$Level <- res$Level +
-                  scale_fill_manual(values = c('#FFC083', '#EDA864', '#AA7139', '#674019'))
-  
-  ref <- as_referrals(ps, c("Waiting", "Evaluating", "Detecting", "Treating"), "Sector")
-  res$Sector <- draw_sankey(ref$Hierarchy, ref$Flows, ref$Stages, y.lab="Visited Sector", 
-                            bar.width=bar.width, padding=padding, height=height+20, interval=interval)
-  
-  ref <- as_referrals(ps, c("Waiting", "Evaluating", "Detecting", "Treating"), "LS")
-  res$LevelSector <- draw_sankey(ref$Hierarchy, ref$Flows, ref$Stages, y.lab="Hospital Level, Sector", tag=F,
-                                 bar.width=bar.width, padding=padding, height=height, interval=interval)
+    ggplot2::scale_fill_manual(values = c('#FFC083', '#EDA864', '#AA7139', '#674019'))
   
   
-  ref <- as_referrals(ps, c("Waiting", "Evaluating", "Detecting", "Treating"), "InOut")
-  res$InOut <- draw_sankey(ref$Hierarchy, ref$Flows, ref$Stages, y.lab="In-Patient / Out-Patient", 
-                           bar.width=bar.width, padding=padding, height=height, interval=interval)
-  
-  res
+  res$Level
 }
