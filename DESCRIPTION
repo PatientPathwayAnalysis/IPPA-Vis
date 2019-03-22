@@ -1,4 +1,4 @@
-Package: ippa-vis
+Package: ippaVis
 Type: Package
 Title: Visualisation of the Individual Patient Pathway Analysis
 Version: 0.1.0
@@ -10,7 +10,11 @@ License: Apache License 2.0
 Encoding: UTF-8
 Imports:
     MASS,
-    ggplot2
+    ggplot2,
+    gridExtra,
+    tools,
+    RGraphics
 Depends:
     R
 LazyData: true
+RoxygenNote: 6.1.1
