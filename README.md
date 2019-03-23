@@ -1,12 +1,11 @@
 # IPPA-Vis
 Visualisation tools for IPPA 
 
-## Install IPPA-Vis
+## Load IPPA-Vis
 
 Install using devtools
 ```r
-library(devtools)
-install_github("PatientPathwayAnalysis/IPPA-vis")
+library(ippaVis)
 ```
 
 ## Sequence frequency diagram
